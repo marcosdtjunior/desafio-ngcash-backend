@@ -1,16 +1,16 @@
-import { DataTypes } from 'sequelize';
+import { DataType } from 'sequelize-typescript';
 import database from '../connection';
 
 const Transaction = database.define('transaction', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataType.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
         unique: true
     },
     value: {
-        type: DataTypes.INTEGER,
+        type: DataType.INTEGER,
         allowNull: false
     }
 });
