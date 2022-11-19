@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import database from './connection';
 import { User, Account, Transaction } from './models/relationships';
-import { registerUser } from './controllers/usersController';
-import { registerAccount } from './controllers/accountsController';
+import { login, registerUser } from './controllers/usersController';
 
 const router: Router = Router();
 
@@ -13,6 +12,6 @@ router.post('/database', async (req, res) => {
 });
 
 router.post('/user', registerUser);
-router.post('/account', registerAccount);
+router.post('/login', login);
 
 export default router;

@@ -1,3 +1,4 @@
+import './env';
 import express, { json } from 'express';
 import router from './routes';
 
