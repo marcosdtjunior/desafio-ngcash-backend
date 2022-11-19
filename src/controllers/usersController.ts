@@ -1,13 +1,19 @@
+import '../env';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { User, Account, Transaction } from '../models/relationships';
 import { UserModel } from '../interfaces/UserModel';
 import { AccountModel } from '../interfaces/AccountModel';
-import { User, Account, Transaction } from '../models/relationships';
-import '../env';
 
 const registerUser = async (req: Request, res: Response) => {
     const user: Omit<UserModel, 'id' | 'accountId'> = req.body;
+
+    const userFound = await User.findOne({ where: { username: user.username } });
+
+    if (userFound) {
+        return res.status(401).json({ mensagem: 'Já existe usuário com o username informado.' });
+    }
 
     const account: Omit<AccountModel, 'id'> = {
         balance: 100
@@ -36,31 +42,36 @@ const login = async (req: Request, res: Response) => {
     const userFound = await User.findOne({ where: { username: user.username } });
 
     if (!userFound) {
-        return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+        return res.status(401).json({ mensagem: 'Usuário e/ou senha inválido(s)' });
     }
 
     const passwordVerified = await bcrypt.compare(user.password, userFound.dataValues.password);
 
     if (!passwordVerified) {
-        return res.status(401).json({ mensagem: 'Usuário e/ou senha inválido(s).' });
+        return res.status(401).json({ mensagem: 'Usuário e/ou senha inválido(s)' });
     }
 
-    const token = jwt.sign({ id: userFound.dataValues.id },
-        process.env.JWT_SECRET ?? '',
-        { expiresIn: '24h' });
-
-    console.log(process.env.JWT_SECRET);
+    const token = jwt.sign({ id: userFound.dataValues.id }, process.env.JWT_SECRET ?? '', { expiresIn: '24h' });
 
     const { password: _, ...userData } = userFound.dataValues;
 
     return res.status(201).json({
-        userData,
+        user: userData,
         token
     });
 
 }
 
+const userBalance = async (req: Request, res: Response) => {
+    const userFound = await User.findOne({ where: { username: req.user.username }, include: Account });
+
+    const balance = Number(userFound?.dataValues.account.dataValues.balance);
+
+    return res.status(200).json({ balance });
+}
+
 export {
     registerUser,
-    login
+    login,
+    userBalance
 };

@@ -7,7 +7,6 @@ User.belongsTo(Account, {
     foreignKey: 'accountId'
 });
 
-Account.hasMany(Transaction);
 Transaction.belongsTo(Account, {
     foreignKey: 'debitedAccountId'
 });

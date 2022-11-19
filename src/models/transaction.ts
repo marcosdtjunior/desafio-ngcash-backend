@@ -10,7 +10,7 @@ const Transaction = database.define('transaction', {
         unique: true
     },
     value: {
-        type: DataType.INTEGER,
+        type: DataType.DECIMAL,
         allowNull: false
     }
 });

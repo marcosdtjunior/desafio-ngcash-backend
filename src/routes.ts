@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import database from './connection';
 import { User, Account, Transaction } from './models/relationships';
-import { login, registerUser } from './controllers/usersController';
+import { login, registerUser, userBalance } from './controllers/usersController';
+import { verifyLogin } from './filters/verifyLogin';
+import { depositValue, transferValue, withdrawValue } from './controllers/transactionsController';
 
 const router: Router = Router();
 
@@ -13,5 +15,12 @@ router.post('/database', async (req, res) => {
 
 router.post('/user', registerUser);
 router.post('/login', login);
+
+router.use(verifyLogin);
+
+router.get('/balance', userBalance);
+router.post('/deposit', depositValue);
+router.post('/withdraw', withdrawValue);
+router.post('/transfer', transferValue);
 
 export default router;
