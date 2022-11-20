@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User, Account, Transaction } from '../models/relationships';
 import { Op } from 'sequelize';
+import { isSameDay, parse } from 'date-fns';
 
 const depositValue = async (req: Request, res: Response) => {
     const { value } = req.body;
@@ -115,9 +116,45 @@ const getTransactions = async (req: Request, res: Response) => {
     });
 }
 
+const filterTransactions = async (req: Request, res: Response) => {
+    const { date } = req.body;
+
+    if (!date) {
+        getTransactions(req, res);
+    } else {
+        const filteringDate = parse(date, 'dd/MM/yyyy', new Date());
+
+        const userFound = await User.findOne({ where: { username: req.user.username }, include: Account });
+        const transactions = await Transaction.findAll({
+            where: {
+                [Op.or]: [
+                    { debitedAccountId: userFound?.dataValues.account.dataValues.id },
+                    { creditedAccountId: userFound?.dataValues.account.dataValues.id }
+                ]
+            }
+        });
+
+        let arrayTransactions: object[] = [];
+        let transactionDate: Date;
+
+        for (let transaction of transactions) {
+            transactionDate = transaction.dataValues.createdAt;
+            if (isSameDay(transactionDate, filteringDate)) {
+                arrayTransactions.push(transaction.dataValues);
+            }
+        }
+
+        return res.status(200).json({
+            accountUser: userFound?.dataValues.username,
+            transactions: arrayTransactions
+        });
+    }
+}
+
 export {
     depositValue,
     withdrawValue,
     transferValue,
-    getTransactions
+    getTransactions,
+    filterTransactions
 }
