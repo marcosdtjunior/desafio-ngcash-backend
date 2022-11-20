@@ -55,6 +55,11 @@ const transferValue = async (req: Request, res: Response) => {
     }
 
     const creditAccount = await Account.findByPk(creditUser?.dataValues.account.dataValues.id);
+
+    if (debitAccount?.dataValues.id === creditAccount?.dataValues.id) {
+        return res.status(400).json({ mensagem: 'Conta de origem e destino são iguais' });
+    }
+
     let creditAccountBalance = Number(creditAccount?.dataValues.balance);
 
     const transferValue = Number(value);
