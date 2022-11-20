@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { User, Account, Transaction } from '../models/relationships';
+import { Op } from 'sequelize';
 
 const depositValue = async (req: Request, res: Response) => {
     const { value } = req.body;
@@ -92,8 +93,31 @@ const transferValue = async (req: Request, res: Response) => {
     });
 }
 
+const getTransactions = async (req: Request, res: Response) => {
+    const userFound = await User.findOne({ where: { username: req.user.username }, include: Account });
+    const transactions = await Transaction.findAll({
+        where: {
+            [Op.or]: [
+                { debitedAccountId: userFound?.dataValues.account.dataValues.id },
+                { creditedAccountId: userFound?.dataValues.account.dataValues.id }
+            ]
+        }
+    });
+
+    let arrayTransactions: object[] = [];
+    for (let transaction of transactions) {
+        arrayTransactions.push(transaction.dataValues);
+    }
+
+    return res.status(200).json({
+        accountUser: userFound?.dataValues.username,
+        transactions: arrayTransactions
+    });
+}
+
 export {
     depositValue,
     withdrawValue,
-    transferValue
+    transferValue,
+    getTransactions
 }

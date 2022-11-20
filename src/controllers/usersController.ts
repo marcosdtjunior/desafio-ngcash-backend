@@ -2,7 +2,7 @@ import '../env';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { User, Account, Transaction } from '../models/relationships';
+import { User, Account } from '../models/relationships';
 import { UserModel } from '../interfaces/UserModel';
 import { AccountModel } from '../interfaces/AccountModel';
 
