@@ -29,6 +29,10 @@ const withdrawValue = async (req: Request, res: Response) => {
     const withdrawValue = Number(value);
     accountBalance -= withdrawValue;
 
+    if (accountBalance < 0) {
+        return res.status(400).json({ mensagem: 'Saldo insuficiente' });
+    }
+
     await account?.update({ balance: accountBalance });
 
     return res.status(201).json({
@@ -45,11 +49,21 @@ const transferValue = async (req: Request, res: Response) => {
     let debitAccountBalance = Number(debitAccount?.dataValues.balance);
 
     const creditUser = await User.findOne({ where: { username: transferUsername }, include: Account });
+
+    if (!creditUser) {
+        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+    }
+
     const creditAccount = await Account.findByPk(creditUser?.dataValues.account.dataValues.id);
     let creditAccountBalance = Number(creditAccount?.dataValues.balance);
 
     const transferValue = Number(value);
     debitAccountBalance -= transferValue;
+
+    if (debitAccountBalance < 0) {
+        return res.status(400).json({ mensagem: 'Saldo insuficiente' });
+    }
+
     creditAccountBalance += transferValue;
 
     await debitAccount?.update({ balance: debitAccountBalance });

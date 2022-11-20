@@ -65,9 +65,12 @@ const login = async (req: Request, res: Response) => {
 const userBalance = async (req: Request, res: Response) => {
     const userFound = await User.findOne({ where: { username: req.user.username }, include: Account });
 
-    const balance = Number(userFound?.dataValues.account.dataValues.balance);
+    const accountBalance = Number(userFound?.dataValues.account.dataValues.balance);
 
-    return res.status(200).json({ balance });
+    return res.status(200).json({
+        accountUser: userFound?.dataValues.username,
+        accountBalance
+    });
 }
 
 export {
