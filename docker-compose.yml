@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  api:
+    container_name: desafio-ngcash-backend
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    command: npm run dev
+
+  db:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: api_ngcash
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
