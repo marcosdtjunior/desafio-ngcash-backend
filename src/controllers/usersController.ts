@@ -5,28 +5,21 @@ import jwt from 'jsonwebtoken';
 import { User, Account } from '../models/relationships';
 import { UserModel } from '../interfaces/UserModel';
 import { AccountModel } from '../interfaces/AccountModel';
-import * as Yup from 'yup';
+import requiredData from '../utils/validations/user';
 
 const registerUser = async (req: Request, res: Response) => {
     const user: Omit<UserModel, 'id' | 'accountId'> = req.body;
 
-    const mandatoryData = Yup.object().shape({
-        username: Yup.string().min(3, { mensagem: 'O campo username necessita de no mínimo 3 caracteres' }).required({ mensagem: 'É necessário informar o username do usuário' }),
-        password: Yup.string().matches(/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, { mensagem: 'A senha precisa ter no mínimo 8 caracteres e pelo menos uma letra maiúscula e um número ' }).required({ mensagem: 'É necessário informar a senha do usuário' })
-    });
+    const validation = requiredData.safeParse(user);
 
-    try {
-        await mandatoryData.validate(user);
-    } catch (error: any) {
-        const yupError = error as Yup.ValidationError;
-        return res.status(400).json(yupError);
+    if (!validation.success) {
+        return res.status(400).json({ mensagem: validation.error.issues[0].message });
     }
-
 
     const userFound = await User.findOne({ where: { username: user.username } });
 
     if (userFound) {
-        return res.status(401).json({ mensagem: 'Já existe usuário com o username informado.' });
+        return res.status(401).json({ mensagem: 'Já existe usuário com o username informado' });
     }
 
     const account: Omit<AccountModel, 'id'> = {
@@ -52,6 +45,12 @@ const registerUser = async (req: Request, res: Response) => {
 
 const login = async (req: Request, res: Response) => {
     const user: Omit<UserModel, 'id' | 'accountId'> = req.body;
+
+    const validation = requiredData.safeParse(user);
+
+    if (!validation.success) {
+        return res.status(400).json({ mensagem: validation.error.issues[0].message });
+    }
 
     const userFound = await User.findOne({ where: { username: user.username } });
 
