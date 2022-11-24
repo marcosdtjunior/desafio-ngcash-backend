@@ -13,6 +13,7 @@ services:
       - db
     volumes:
       - .:/usr/api
+      - /usr/api/node_modules
     command: npm run dev
 
   db:
