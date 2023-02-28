@@ -11,6 +11,15 @@ const depositValue = async (req: Request, res: Response) => {
     let accountBalance = Number(account?.dataValues.balance);
 
     const depositValue = Number(value);
+
+    if (depositValue < 0) {
+        return res.status(400).json({ mensagem: 'O valor inserido é negativo' });
+    }
+
+    if (depositValue === 0) {
+        return res.status(400).json({ mensagem: 'Por favor, insira um valor maior que zero' });
+    }
+
     accountBalance += depositValue;
 
     await account?.update({ balance: accountBalance });
@@ -29,6 +38,15 @@ const withdrawValue = async (req: Request, res: Response) => {
     let accountBalance = Number(account?.dataValues.balance);
 
     const withdrawValue = Number(value);
+
+    if (withdrawValue < 0) {
+        return res.status(400).json({ mensagem: 'O valor inserido é negativo' });
+    }
+
+    if (withdrawValue === 0) {
+        return res.status(400).json({ mensagem: 'Por favor, insira um valor maior que zero' });
+    }
+
     accountBalance -= withdrawValue;
 
     if (accountBalance < 0) {
