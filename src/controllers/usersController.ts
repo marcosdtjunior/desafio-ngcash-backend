@@ -19,7 +19,7 @@ const registerUser = async (req: Request, res: Response) => {
     const userFound = await User.findOne({ where: { username: user.username } });
 
     if (userFound) {
-        return res.status(401).json({ mensagem: 'Já existe usuário com o nome de usuário informado' });
+        return res.status(401).json({ mensagem: 'Já existe um usuário com o nome de usuário informado' });
     }
 
     const account: Omit<AccountModel, 'id'> = {
