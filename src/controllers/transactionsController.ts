@@ -12,12 +12,8 @@ const depositValue = async (req: Request, res: Response) => {
 
     const depositValue = Number(value);
 
-    if (depositValue < 0) {
-        return res.status(400).json({ mensagem: 'O valor inserido é negativo' });
-    }
-
-    if (depositValue === 0) {
-        return res.status(400).json({ mensagem: 'Por favor, insira um valor maior que zero' });
+    if (depositValue <= 0) {
+        return res.status(400).json({ message: 'Só são permitidos valores positivos' });
     }
 
     accountBalance += depositValue;
@@ -39,18 +35,14 @@ const withdrawValue = async (req: Request, res: Response) => {
 
     const withdrawValue = Number(value);
 
-    if (withdrawValue < 0) {
-        return res.status(400).json({ mensagem: 'O valor inserido é negativo' });
-    }
-
-    if (withdrawValue === 0) {
-        return res.status(400).json({ mensagem: 'Por favor, insira um valor maior que zero' });
+    if (withdrawValue <= 0) {
+        return res.status(400).json({ message: 'Só são permitidos valores positivos' });
     }
 
     accountBalance -= withdrawValue;
 
     if (accountBalance < 0) {
-        return res.status(400).json({ mensagem: 'Saldo insuficiente' });
+        return res.status(400).json({ message: 'Saldo insuficiente' });
     }
 
     await account?.update({ balance: accountBalance });
@@ -71,22 +63,27 @@ const transferValue = async (req: Request, res: Response) => {
     const creditUser = await User.findOne({ where: { username: transferUsername }, include: Account });
 
     if (!creditUser) {
-        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+        return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 
     const creditAccount = await Account.findByPk(creditUser?.dataValues.account.dataValues.id);
 
     if (debitAccount?.dataValues.id === creditAccount?.dataValues.id) {
-        return res.status(400).json({ mensagem: 'Conta de origem e destino são iguais' });
+        return res.status(400).json({ message: 'Conta de origem e destino são iguais' });
     }
 
     let creditAccountBalance = Number(creditAccount?.dataValues.balance);
 
     const transferValue = Number(value);
+
+    if (transferValue <= 0) {
+        return res.status(400).json({ message: 'Só são permitidos valores positivos' });
+    }
+
     debitAccountBalance -= transferValue;
 
     if (debitAccountBalance < 0) {
-        return res.status(400).json({ mensagem: 'Saldo insuficiente' });
+        return res.status(400).json({ message: 'Saldo insuficiente' });
     }
 
     creditAccountBalance += transferValue;

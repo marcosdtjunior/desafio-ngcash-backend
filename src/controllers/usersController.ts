@@ -86,8 +86,22 @@ const userBalance = async (req: Request, res: Response) => {
     });
 }
 
+const getUsers = async (req: Request, res: Response) => {
+    const users = await User.findAll();
+
+    let arrayUsers: object[] = [];
+    for (let user of users) {
+        let { id, username } = user.dataValues;
+        let userData = { id, username };
+        arrayUsers.push(userData);
+    }
+
+    return res.status(200).json(arrayUsers);
+}
+
 export {
     registerUser,
     login,
-    userBalance
+    userBalance,
+    getUsers
 };

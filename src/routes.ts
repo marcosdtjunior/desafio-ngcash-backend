@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import database from './connection';
 import { User, Account, Transaction } from './models/relationships';
-import { login, registerUser, userBalance } from './controllers/usersController';
+import { login, registerUser, userBalance, getUsers } from './controllers/usersController';
 import { verifyLogin } from './filters/verifyLogin';
 import { depositValue, filterTransactions, getTransactions, transferValue, withdrawValue } from './controllers/transactionsController';
 
@@ -19,6 +19,7 @@ router.post('/login', login);
 router.use(verifyLogin);
 
 router.get('/balance', userBalance);
+router.get('/users', getUsers);
 router.post('/deposit', depositValue);
 router.post('/withdraw', withdrawValue);
 router.post('/transfer', transferValue);
