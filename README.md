@@ -1,3 +1,5 @@
+**Link da aplicação:** https://projeto-prototipo-banco.vercel.app/
+
 ### Instruções para executar o projeto:
 
 Primeiramente, é necessário criar um arquivo `.env` na raíz do projeto com as seguintes configurações para a execução da API:
