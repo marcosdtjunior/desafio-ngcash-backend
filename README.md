@@ -1,4 +1,4 @@
-**Link da aplicação:** https://projeto-prototipo-banco.vercel.app/
+***Link da aplicação:*** https://projeto-prototipo-banco.vercel.app/
 
 ### Instruções para executar o projeto:
 
