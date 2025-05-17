@@ -5,7 +5,7 @@ import { login, registerUser, userBalance, getUsers } from './controllers/usersC
 import { verifyLogin } from './filters/verifyLogin';
 import { depositValue, filterTransactions, getTransactions, transferValue, withdrawValue } from './controllers/transactionsController';
 
-const router: Router = Router();
+const router = Router();
 
 router.post('/database', async (req, res) => {
     const models = { User, Account, Transaction };
@@ -13,17 +13,23 @@ router.post('/database', async (req, res) => {
     res.status(200).json({ mensagem: 'Banco de dados criado com sucesso!' });
 });
 
-router.post('/user', registerUser);
-router.post('/login', login);
+function asyncHandler(fn: any) {
+    return (req: any, res: any, next: any) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+}
 
-router.use(verifyLogin);
+router.post('/user', asyncHandler(registerUser));
+router.post('/login', asyncHandler(login));
 
-router.get('/balance', userBalance);
-router.get('/users', getUsers);
-router.post('/deposit', depositValue);
-router.post('/withdraw', withdrawValue);
-router.post('/transfer', transferValue);
-router.get('/getTransactions', getTransactions);
-router.get('/filterTransactions', filterTransactions);
+router.use(asyncHandler(verifyLogin));
+
+router.get('/balance', asyncHandler(userBalance));
+router.get('/users', asyncHandler(getUsers));
+router.post('/deposit', asyncHandler(depositValue));
+router.post('/withdraw', asyncHandler(withdrawValue));
+router.post('/transfer', asyncHandler(transferValue));
+router.get('/getTransactions', asyncHandler(getTransactions));
+router.get('/filterTransactions', asyncHandler(filterTransactions));
 
 export default router;
