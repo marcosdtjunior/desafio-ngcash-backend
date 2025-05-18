@@ -6,7 +6,14 @@ const sequelize = new Sequelize(process.env.DB_NAME ?? '', process.env.DB_USER ?
     host: process.env.DB_HOST ?? '',
     dialect: 'postgres',
     dialectModule: pg,
-    port: 5432
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: true,
+            ca: process.env.DB_CA ?? ''
+        }
+    }
 });
 
 export default sequelize;
